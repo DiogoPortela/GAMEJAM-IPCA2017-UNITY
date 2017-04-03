@@ -11,22 +11,24 @@ public class Movement : MonoBehaviour
     public player Player;
     public bool isFalling;
     public bool isJumping;
+    public bool isKid;
+    public BoxCollider2D thisCollider;
     public BoxCollider2D floorCollider;
 
     private Rigidbody2D rigidBody;
-    private float initDrag;
     private Animator animator;
+    private Vector2 DeltaSpeed;
 
+    private Vector2 adultSize, kidSize;
     void Start()
     {
         animator = GetComponent<Animator>();
         rigidBody = GetComponent<Rigidbody2D>();
-        initDrag = rigidBody.drag;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        DeltaSpeed = Vector2.zero;
         if(rigidBody.velocity == Vector2.zero)
         {
             animator.SetInteger("MovingDirection", 0);
@@ -43,37 +45,46 @@ public class Movement : MonoBehaviour
         {
             if (Input.GetAxis("HorizontalP1") != 0 && rigidBody.velocity.magnitude < 500)
             {
-                this.rigidBody.AddForce(new Vector3(Input.GetAxis("HorizontalP1") * Speed * Time.deltaTime, 0, 0));
-                //this.rigidBody.position += new Vector2(Input.GetAxis("HorizontalP1") * Speed * Time.deltaTime, 0);
-                int aux = 0;
-                if (Input.GetAxis("HorizontalP1") > 0)
-                    aux = 1;
-                else if (Input.GetAxis("HorizontalP1") < 0)
-                    aux = -1;
-                animator.SetInteger("MovingDirection", aux);
+                DeltaSpeed += new Vector2(Input.GetAxis("HorizontalP1") * Speed * Time.deltaTime, 0);
+                animator.SetInteger("MovingDirection", (int)DeltaSpeed.normalized.x);
             }
             if (Input.GetKey(KeyCode.UpArrow) && !isFalling && !isJumping)
             {
-                this.rigidBody.AddForce(new Vector3(0, JumpingForce, 0));
+                DeltaSpeed += new Vector2(0, JumpingForce);
                 isJumping = true;
                 animator.SetBool("isJumping", true);
             }
-        }
+            if(Input.GetKeyDown(KeyCode.Keypad0))
+            {
+                isKid = !isKid;
+                animator.SetBool("isKid", isKid);
+
+            }
+        }   //PLAYER ONE
         else
         {
             if (Input.GetAxis("HorizontalP2") != 0 && rigidBody.velocity.magnitude < 500)
             {
-                this.rigidBody.AddForce(new Vector3(Input.GetAxis("HorizontalP2") * Speed * Time.deltaTime, 0, 0));
+                DeltaSpeed += new Vector2(Input.GetAxis("HorizontalP2") * Speed * Time.deltaTime, 0);
+                animator.SetInteger("MovingDirection", (int)DeltaSpeed.normalized.x);
             }
-            if (Input.GetKey(KeyCode.W) && !isFalling && !isJumping)
+            if (Input.GetKey(KeyCode.UpArrow) && !isFalling && !isJumping)
             {
-                this.rigidBody.AddForce(new Vector3(0, JumpingForce, 0));
+                DeltaSpeed += new Vector2(0, JumpingForce);
                 isJumping = true;
                 animator.SetBool("isJumping", true);
             }
-        }
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                isKid = !isKid;
+                animator.SetBool("isKid", isKid);
+
+            }
+        }                        //PLAYER TWO
+        rigidBody.AddForce(DeltaSpeed, ForceMode2D.Impulse);
 
     }
+    //TESTS IF THERE IS SOMETHING BELLOW THE PLAYER
     private void OnTriggerStay2D(Collider2D collision)
     {
         isFalling = false;

@@ -68,7 +68,7 @@ public class Movement : MonoBehaviour
                 DeltaSpeed += new Vector2(Input.GetAxis("HorizontalP2") * Speed * Time.deltaTime, 0);
                 animator.SetInteger("MovingDirection", (int)DeltaSpeed.normalized.x);
             }
-            if (Input.GetKey(KeyCode.UpArrow) && !isFalling && !isJumping)
+            if (Input.GetKey(KeyCode.W) && !isFalling && !isJumping)
             {
                 DeltaSpeed += new Vector2(0, JumpingForce);
                 isJumping = true;
